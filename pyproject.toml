@@ -1,0 +1,66 @@
+[project]
+name = "typdoc"
+version = "0.1.0"
+description = "Changes a document's type and nothing else: binds pictures (a photo, a scan, several of them) into one PDF as the standard medRDS says, every picture in it byte for byte; reproducible."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "AGPL-3.0-or-later"
+authors = [{ name = "fre.ms", email = "fre.ms@fre.ms" }]
+keywords = ["pdf", "photo", "scan", "heic", "jpeg", "medrds", "records", "reproducible"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Healthcare Industry",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+]
+dependencies = [
+  # the core the tools of docrepro share: configuration documents, errors, the command
+  # line's manners, no network
+  "doccor>=0.2",
+  # pictures that are no JPEG are shown as one: decoded here, HEIC and HEIF too
+  "pillow>=11",
+  "pillow-heif>=0.20",
+]
+
+[project.entry-points."docrepro.steps"]
+# typdoc is step 5 of docrepro; installing it puts it into the chain
+typdoc = "typdoc.docrepro:TypdocAdapter"
+
+[tool.uv.sources]
+doccor = { git = "https://github.com/fre-ms/doccor", tag = "v0.2.0" }
+
+[project.scripts]
+typdoc = "typdoc.cli:main"
+
+[project.urls]
+Source = "https://github.com/fre-ms/typdoc"
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "pytest-timeout>=2.3",
+  "pymupdf>=1.25,<2",
+  "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["typdoc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 600
+timeout_method = "thread"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
