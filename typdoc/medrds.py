@@ -46,11 +46,12 @@ class JpegFacts:
 @dataclass(frozen=True)
 class Picture:
     """A picture to bind: its ``name`` (as the PDF and the origin name it), its ``data``
-    as it came, and for a picture that is no JPEG the JPEG the page shows (``shown``)."""
+    as it came, and for a picture that is no JPEG the JPEG the page shows (``shown``); for
+    a file of several pictures (a TIFF of several pages) a list, a JPEG for each page."""
 
     name: str
     data: bytes
-    shown: bytes | None = None
+    shown: bytes | list[bytes] | None = None
 
 
 def is_jpeg(data: bytes) -> bool:
@@ -138,8 +139,9 @@ def _stream(dictionary: str, data: bytes) -> bytes:
 
 def bind(pictures: list[Picture]) -> tuple[bytes, list[dict[str, str]]]:
     """Several pictures of one document bound into one PDF, a page for each, in the order
-    given.  Returns the PDF and, for the origin, each picture's name and SHA-256.  Raises
-    :class:`NotBound`."""
+    given; a file of several pictures gives a page for each of them, and lies in the PDF
+    once, associated with each of its pages.  Returns the PDF and, for the origin, each
+    file's name and SHA-256.  Raises :class:`NotBound`."""
     if not pictures:
         raise NotBound("There is no picture to bind.")
     objects: list[bytes | None] = []  # bodies, numbered from 1
@@ -157,40 +159,47 @@ def bind(pictures: list[Picture]) -> tuple[bytes, list[dict[str, str]]]:
             raise NotBound(f"Picture {k + 1} has no name.")
         bound.append({"name": picture.name, "sha256": hashlib.sha256(picture.data).hexdigest()})
         jpeg = is_jpeg(picture.data)
-        image = picture.data if jpeg else picture.shown
-        if image is None or not is_jpeg(image):
+        given = picture.shown if isinstance(picture.shown, list) else [picture.shown]
+        images = [picture.data] if jpeg else given
+        if not images or any(image is None or not is_jpeg(image) for image in images):
             raise NotBound(f'"{picture.name}" is no JPEG, and nothing to show of it was '
                            "given as one.")
-        facts = jpeg_facts(image)
-        space = {1: "/DeviceGray", 3: "/DeviceRGB", 4: "/DeviceCMYK"}[facts.components]
-        decode = " /Decode [1 0 1 0 1 0 1 0]" if facts.components == 4 and facts.adobe else ""
-        image_number = add(_stream(
-            f"/Type /XObject /Subtype /Image /Width {facts.width} /Height {facts.height} "
-            f"/ColorSpace {space} /BitsPerComponent 8 /Filter /DCTDecode{decode}", image))
-        scale = LONG_SIDE / max(facts.width, facts.height)
-        w, h = facts.width * scale, facts.height * scale
-        rotate, mirrored = _TURN[facts.orientation]
-        matrix = (f"{_number(-w)} 0 0 {_number(h)} {_number(w)} 0" if mirrored
-                  else f"{_number(w)} 0 0 {_number(h)} 0 0")
-        content = add(_stream("", f"q {matrix} cm /Im0 Do Q".encode()))
-        af = ""
-        if not jpeg:
-            name = picture.name
-            ext = name[name.rfind(".") + 1:].lower() if "." in name else ""
-            subtype = (f" /Subtype /{MEDIA_TYPES[ext].replace('/', '#2F')}"
-                       if ext in MEDIA_TYPES else "")
-            file_number = add(_stream(
-                f"/Type /EmbeddedFile{subtype} /Params << /Size {len(picture.data)} >>",
-                picture.data))
-            spec = add(f"<< /Type /Filespec /F {_pdf_text(name)} /UF {_pdf_text(name)} "
-                       f"/EF << /F {file_number} 0 R >> /AFRelationship /Source >>".encode())
-            attached.append((name, spec))
-            af = f" /AF [{spec} 0 R]"
-        turn = f" /Rotate {rotate}" if rotate else ""
-        kids.append(add(
-            f"<< /Type /Page /Parent {pages} 0 R /MediaBox [0 0 {_number(w)} {_number(h)}]"
-            f"{turn} /Resources << /XObject << /Im0 {image_number} 0 R >> >> "
-            f"/Contents {content} 0 R{af} >>".encode()))
+        spec: int | None = None  # the file associated with each of its pages
+        for image in images:
+            assert image is not None
+            facts = jpeg_facts(image)
+            space = {1: "/DeviceGray", 3: "/DeviceRGB", 4: "/DeviceCMYK"}[facts.components]
+            decode = (" /Decode [1 0 1 0 1 0 1 0]" if facts.components == 4 and facts.adobe
+                      else "")
+            image_number = add(_stream(
+                f"/Type /XObject /Subtype /Image /Width {facts.width} /Height {facts.height} "
+                f"/ColorSpace {space} /BitsPerComponent 8 /Filter /DCTDecode{decode}", image))
+            scale = LONG_SIDE / max(facts.width, facts.height)
+            w, h = facts.width * scale, facts.height * scale
+            rotate, mirrored = _TURN[facts.orientation]
+            matrix = (f"{_number(-w)} 0 0 {_number(h)} {_number(w)} 0" if mirrored
+                      else f"{_number(w)} 0 0 {_number(h)} 0 0")
+            content = add(_stream("", f"q {matrix} cm /Im0 Do Q".encode()))
+            af = ""
+            if not jpeg:
+                if spec is None:
+                    name = picture.name
+                    ext = name[name.rfind(".") + 1:].lower() if "." in name else ""
+                    subtype = (f" /Subtype /{MEDIA_TYPES[ext].replace('/', '#2F')}"
+                               if ext in MEDIA_TYPES else "")
+                    file_number = add(_stream(
+                        f"/Type /EmbeddedFile{subtype} /Params << /Size {len(picture.data)} >>",
+                        picture.data))
+                    spec = add(f"<< /Type /Filespec /F {_pdf_text(name)} /UF {_pdf_text(name)} "
+                               f"/EF << /F {file_number} 0 R >> /AFRelationship /Source >>"
+                               .encode())
+                    attached.append((name, spec))
+                af = f" /AF [{spec} 0 R]"
+            turn = f" /Rotate {rotate}" if rotate else ""
+            kids.append(add(
+                f"<< /Type /Page /Parent {pages} 0 R /MediaBox [0 0 {_number(w)} {_number(h)}]"
+                f"{turn} /Resources << /XObject << /Im0 {image_number} 0 R >> >> "
+                f"/Contents {content} 0 R{af} >>".encode()))
     names = ""
     if attached:
         listed = " ".join(f"{_pdf_text(n)} {number} 0 R" for n, number in attached)

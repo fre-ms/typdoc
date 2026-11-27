@@ -22,7 +22,7 @@ from typdoc import __version__, medrds, pictures
 from typdoc.errors import TypdocError
 from typdoc.project import SUFFIX, TYPES, Options, Project, load_config
 
-INTERFACE = 2  # the version of docs/interface.md the answers follow
+INTERFACE = 3  # the version of docs/interface.md the answers follow
 TOOL = "typdoc"
 
 
@@ -53,7 +53,7 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         project = Project.open(args.pictures, Options(to=args.to or TYPES[0]))
     bound = project.build(frame.progress if args.progress else None)
     paths = output.write(bound, _out(args), args.pictures[0].stem)
-    return {**{k: str(v) for k, v in paths.items()}, "pages": len(bound.bound),
+    return {**{k: str(v) for k, v in paths.items()}, "pages": bound.pages,
             "bound": [{"sha256": entry["sha256"], "attached": attached}
                       for entry, attached in zip(bound.bound, bound.attached, strict=True)]}
 

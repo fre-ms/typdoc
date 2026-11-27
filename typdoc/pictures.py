@@ -36,10 +36,11 @@ def read(path: Path) -> bytes:
         raise TypdocError("unreadable") from e
 
 
-def shown(data: bytes) -> bytes | None:
-    """The JPEG a page shows of a picture: None for a JPEG (it is shown as it is), else
-    the JPEG made of it.  Raises "unreadable" for what is no picture, "several-frames"
-    for a file of several."""
+def shown(data: bytes) -> bytes | list[bytes] | None:
+    """What the pages show of a picture: None for a JPEG (it is shown as it is), else the
+    JPEG made of it; for a file of several pictures (a TIFF of several pages, a HEIC of
+    several images, the frames of a GIF) a list, the JPEG of each, in their order.  Raises
+    "unreadable" for what is no picture."""
     if medrds.is_jpeg(data):
         try:
             medrds.jpeg_facts(data)
@@ -51,22 +52,23 @@ def shown(data: bytes) -> bytes | None:
 
     pillow_heif.register_heif_opener()
     try:
+        made = []
         with Image.open(io.BytesIO(data)) as image:
-            if getattr(image, "n_frames", 1) > 1:
-                raise TypdocError("several-frames")
-            upright = ImageOps.exif_transpose(image)
-            if upright.mode in ("RGBA", "LA", "PA") or "transparency" in upright.info:
-                rgba = upright.convert("RGBA")
-                white = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
-                flat = Image.alpha_composite(white, rgba).convert("RGB")
-            elif upright.mode in ("L", "1", "I;16", "I", "F"):
-                flat = upright.convert("L")
-            else:
-                flat = upright.convert("RGB")
-            buffer = io.BytesIO()
-            flat.save(buffer, format="JPEG", quality=QUALITY, subsampling=0, optimize=False)
-            return buffer.getvalue()
-    except TypdocError:
-        raise
+            frames = int(getattr(image, "n_frames", 1))
+            for n in range(frames):
+                image.seek(n)
+                upright = ImageOps.exif_transpose(image)
+                if upright.mode in ("RGBA", "LA", "PA") or "transparency" in upright.info:
+                    rgba = upright.convert("RGBA")
+                    white = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
+                    flat = Image.alpha_composite(white, rgba).convert("RGB")
+                elif upright.mode in ("L", "1", "I;16", "I", "F"):
+                    flat = upright.convert("L")
+                else:
+                    flat = upright.convert("RGB")
+                buffer = io.BytesIO()
+                flat.save(buffer, format="JPEG", quality=QUALITY, subsampling=0, optimize=False)
+                made.append(buffer.getvalue())
+        return made if frames > 1 else made[0]
     except Exception as e:  # Pillow words its failures with what it was given
         raise TypdocError("unreadable") from e

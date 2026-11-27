@@ -1,5 +1,6 @@
 """typdoc as step 5 of docrepro, through the entry point ``docrepro.steps`` (see
-docrepro's ``steps``): it takes the original where that is a picture and hands on a PDF.
+docrepro's ``steps``): it takes the original where that is a picture, or the originals
+where several pictures are one document, and hands on one PDF.
 docrepro does not import this module's types; it calls the methods its ``Adapter`` names.
 """
 
@@ -19,10 +20,12 @@ class TypdocAdapter:
     def __init__(self) -> None:
         self.version = typdoc.__version__
 
-    def open(self, source: Path, config: dict[str, Any] | None, settings: dict[str, Any],
-             scratch: Path) -> Project:
-        """typdoc's project on the original picture."""
-        return Project.open([source], None if config else Options(), config)
+    def open(self, source: Path | list[Path], config: dict[str, Any] | None,
+             settings: dict[str, Any], scratch: Path) -> Project:
+        """typdoc's project on the original picture, or on the pictures of one document in
+        their order."""
+        pictures = list(source) if isinstance(source, list) else [source]
+        return Project.open(pictures, None if config else Options(), config)
 
     def config(self, project: Project) -> dict[str, Any]:
         return project.config()

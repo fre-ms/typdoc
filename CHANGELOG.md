@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 (2026-11-27)
+
+Interface 3; `typdoc-config` version 1 stays.
+
+- **A file of several pictures is bound**, a page for each, where it was refused: a TIFF of several
+  pages, a HEIC of several images, the frames of a GIF. The file lies in the PDF once, associated
+  with each of its pages, and each page shows a JPEG of its own picture, as medRDS 9.5 says (from
+  medRDS 0.15.1). The same bytes as the standard's reference library. `pages` in the answer counts
+  the pages; the kind of error `several-frames` is gone.
+
 ## 0.2.1 (2026-11-27)
 
 With doccor 0.3.0, which every tool of docrepro names. Interface 2 and `typdoc-config` version 1

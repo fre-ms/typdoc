@@ -1,6 +1,6 @@
 # typdoc's command line as an interface
 
-**Interface 2**, since typdoc 0.2.0. This is what a program may rely on when it calls typdoc,
+**Interface 3**, since typdoc 0.3.0. This is what a program may rely on when it calls typdoc,
 whatever language it is written in: a records app, a script, docrepro.
 
 Every answer carries `interface`. It goes up when something a caller relies on changes in a way
@@ -9,8 +9,12 @@ interface, new fields, new options and new kinds of error may come; a caller ign
 does not know and treats an unknown kind of error like any other (its message says what
 happened). Releases are tagged; pin a tag, not a branch.
 
-**From interface 1:** the answer names the bound PDF `document`, no longer `pdf`, as every tool of
-docrepro does from now on (a document need not be a PDF, though typdoc's always is one).
+**From interface 2:** a file of several pictures (a TIFF of several pages, a HEIC of several images,
+the frames of a GIF) is bound now, a page for each of its pictures, where it was refused: the kind of
+error `several-frames` is gone. `pages` counts the pages, which may be more than the files; `bound`
+names each file once.
+
+**From interface 1 (typdoc 0.2.0):** the answer names the bound PDF `document`, no longer `pdf`.
 
 typdoc does one step of docrepro: it **changes a document's type** and nothing else. Pictures
 become one PDF, bound as the standard medRDS says (specification 9.5). The step is optional: the
@@ -34,12 +38,12 @@ is nothing to decide but the order of the pictures, which is the order they are 
 | field | example | meaning |
 |---|---|---|
 | `interface` | `2` | the version of this description |
-| `made_with` | `"typdoc 0.2.1"` | the program and its version |
+| `made_with` | `"typdoc 0.3.0"` | the program and its version |
 
 ## `about`
 
 ```json
-{"interface": 2, "made_with": "typdoc 0.2.1", "version": "0.2.1",
+{"interface": 3, "made_with": "typdoc 0.3.0", "version": "0.3.0",
  "standard": "https://medrds.org/spec/0.15",
  "pictures": ["jpg", "jpeg", "png", "tif", "tiff", "heic", "heif", "webp", "bmp", "gif", "pnm"],
  "to": ["pdf"]}
@@ -68,6 +72,9 @@ picture) it writes two files, named after the first picture:
   full colour resolution, with none of the picture's metadata.
 - Each page is **turned as its picture's orientation says** (`/Rotate`; mirrored where the
   picture is), and its long side is that of A4 (842 points).
+- A file of **several pictures** (a TIFF of several pages, a HEIC of several images) gives a page
+  for each, in their order. The file lies in the PDF once, associated with each of its pages, and
+  each page shows a JPEG made of its own picture.
 - The PDF has **no date, no identifier, no program's name**. Every picture can be taken out of
   it again as it went in.
 - In the PDF a picture is named by its place and its type (`picture-2.png`), never by its
@@ -76,14 +83,14 @@ picture) it writes two files, named after the first picture:
 The answer:
 
 ```json
-{"interface": 2, "made_with": "typdoc 0.2.1",
+{"interface": 3, "made_with": "typdoc 0.3.0",
  "document": "<folder>/<stem>.pdf", "config": "<folder>/<stem>.typdoc.json", "pages": 2,
  "bound": [{"sha256": "…", "attached": false}, {"sha256": "…", "attached": true}]}
 ```
 
-`bound` names every picture in the order of the pages by its SHA-256 and says whether it is
-attached to its page (`true`: a picture that is no JPEG) or is the image of its page (`false`:
-a JPEG). A records app that files the PDF names the pictures in its origin (medRDS 7.3,
+`bound` names every file in the order of the pages by its SHA-256 and says whether it is
+attached to its pages (`true`: a picture that is no JPEG) or is the image of its page (`false`:
+a JPEG); `pages` counts the pages. A records app that files the PDF names the pictures in its origin (medRDS 7.3,
 `bound`) from this.
 
 With `--config` typdoc binds as a configuration document says; `--to` beside it is a `usage`
@@ -93,7 +100,7 @@ picture.
 ## The configuration document: `typdoc-config`, version 1
 
 ```json
-{"format": "typdoc-config", "version": 1, "made_with": "typdoc 0.2.1",
+{"format": "typdoc-config", "version": 1, "made_with": "typdoc 0.3.0",
  "input": {"pictures": [{"sha256": "…", "bytes": 245678, "suffix": ".jpg"},
                         {"sha256": "…", "bytes": 1832011, "suffix": ".heic"}]},
  "options": {"to": "pdf"}}
@@ -108,7 +115,7 @@ PDF and nothing more); within docrepro the chain document does.
 ## Failures
 
 ```json
-{"interface": 2, "made_with": "typdoc 0.2.1", "error": "not-picture", "details": {},
+{"interface": 3, "made_with": "typdoc 0.3.0", "error": "not-picture", "details": {},
  "message": {"en": "typdoc binds pictures into a PDF; this file is a PDF already.",
              "de": "typdoc bindet Bilder zu einem PDF; diese Datei ist schon ein PDF."}}
 ```
@@ -119,7 +126,6 @@ PDF and nothing more); within docrepro the chain document does.
 | `not-picture` | a PDF was given: it is one already | |
 | `unsupported` | a file type typdoc does not bind | `suffix` |
 | `unreadable` | the file is no picture: damaged, or not what its name says | |
-| `several-frames` | the file holds several pictures (a TIFF of several pages, an animation) | |
 | `bad-config` | the document is no readable JSON, not of this version, or a value of the wrong kind | `reason`: `json`, `format`, `field` |
 | `config-mismatch` | the document belongs to other pictures, or to another order | |
 | `unwritable` | the folder cannot take the results | |

@@ -17,6 +17,7 @@ from tests.conftest import (
     needs_medrds,
     reference_bind,
     reference_unbinds,
+    several,
     with_orientation,
 )
 from typdoc import medrds, pictures
@@ -88,6 +89,8 @@ def test_the_same_bytes_as_the_reference_library(tmp_path: Path, jpeg: bytes, pn
     byte, whatever the pictures' formats, orientations, colours and names; and it takes
     out of typdoc's PDF every picture as it went in."""
     assert medrds.STANDARD in (MEDRDS / "schema" / "medrds.json").read_text(encoding="utf-8")[:200]
+    pages = several(letter(mode="L"), letter(300, 200), letter(), form="TIFF")
+    two = several(letter(), letter(500, 350), form="HEIF")
     cases: list[list[tuple[str, bytes, bytes | None]]] = [
         [("picture-1.jpg", jpeg, None)],
         [("IMG_1.jpeg", jpeg, None), ("Seite 2 – Anlage.png", png, pictures.shown(png)),
@@ -100,6 +103,8 @@ def test_the_same_bytes_as_the_reference_library(tmp_path: Path, jpeg: bytes, pn
          ("scan.tiff", encoded(letter(mode="L"), "TIFF"),
           pictures.shown(encoded(letter(mode="L"), "TIFF"))),
          ("ohne-endung", png, pictures.shown(png))],
+        [("seiten.tiff", pages, pictures.shown(pages)), ("foto.jpg", jpeg, None),
+         ("zwei.heic", two, pictures.shown(two))],
     ]
     for k, case in enumerate(cases):
         ours, bound = medrds.bind([medrds.Picture(*picture) for picture in case])

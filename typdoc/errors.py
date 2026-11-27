@@ -14,12 +14,6 @@ _OWN: dict[str, dict[str, str]] = {
         "en": "{tool} binds pictures into a PDF; this file is a PDF already.",
         "de": "{tool} bindet Bilder zu einem PDF; diese Datei ist schon ein PDF.",
     },
-    "several-frames": {
-        "en": "The file holds several pictures (a TIFF of several pages, an animation); "
-              "{tool} binds files of one picture each.",
-        "de": "Die Datei enthält mehrere Bilder (ein mehrseitiges TIFF, eine Animation); "
-              "{tool} bindet Dateien mit je einem Bild.",
-    },
 }
 
 _core.register(_OWN)

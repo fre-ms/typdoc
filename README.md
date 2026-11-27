@@ -7,7 +7,9 @@ pictures of one report become **one PDF**, bound as the standard
 - a **JPEG** is the image of its page, byte for byte;
 - a picture of **another format** (HEIC, PNG, TIFF, WebP …) is attached to its page as it came,
   byte for byte, and the page shows a JPEG made of it;
-- each page is **turned as the picture's orientation says**, and is as long as a sheet of A4.
+- each page is **turned as the picture's orientation says**, and is as long as a sheet of A4;
+- a file of **several pictures** (a TIFF of several pages) gives a page for each, and lies in the PDF
+  once.
 
 Binding changes no picture: every picture can be taken out of the PDF again exactly as it went in.
 The PDF has no date and no identifier, so the same pictures in the same order give the same bytes,
@@ -31,7 +33,7 @@ a description and a signature; it is not a condition. typdoc is the one step tha
 document's type, and it is optional: the steps after it take what they are handed, typdoc's PDF or
 the picture as it came. Why the work is divided so: `docs/family-design.md` in optdoc.
 
-**Status: pre-alpha (0.2.1).**
+**Status: pre-alpha (0.3.0).**
 
 ## Install
 
@@ -78,7 +80,6 @@ output.write(bound, "results", "letter")      # letter.pdf and letter.typdoc.jso
 
 ## Not yet
 
-- A file with several pictures in it (a TIFF of several pages) is refused (`several-frames`).
 - Other directions (a PDF's pages as pictures) and other targets than PDF.
 
 ## Licence

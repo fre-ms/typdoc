@@ -69,6 +69,7 @@ class Bound:
     bound: list[dict[str, str]]
     attached: list[bool]
     config: dict[str, Any]
+    pages: int = 0  # a file of several pictures gives a page for each
 
 
 class Project:
@@ -107,8 +108,8 @@ class Project:
                 "options": {"to": self.options.to}}
 
     def build(self, progress: Progress | None = None) -> Bound:
-        """Bind the pictures.  Raises "unreadable" for what is no picture, and
-        "several-frames"."""
+        """Bind the pictures (a file of several gives a page for each of them).  Raises
+        "unreadable" for what is no picture."""
         bound_pictures: list[medrds.Picture] = []
         for n, (suffix, data) in enumerate(self.files, 1):
             if progress is not None:
@@ -119,7 +120,9 @@ class Project:
             pdf, bound = medrds.bind(bound_pictures)
         except medrds.NotBound as e:
             raise TypdocError("unreadable") from e
-        return Bound(pdf, bound, [p.shown is not None for p in bound_pictures], self.config())
+        pages = sum(len(p.shown) if isinstance(p.shown, list) else 1 for p in bound_pictures)
+        return Bound(pdf, bound, [p.shown is not None for p in bound_pictures], self.config(),
+                     pages)
 
     def close(self) -> None:
         """Nothing is held open; here for the manners of the other tools' projects."""

@@ -123,10 +123,8 @@ def test_what_is_no_picture(tmp_path: Path, jpeg: bytes) -> None:
     text.write_bytes(b"kein Bild")
     cut = folder / "halb.png"
     cut.write_bytes(encoded(letter(), "PNG")[:200])
-    pages = folder / "zwei.tiff"
-    letter().save(pages, format="TIFF", save_all=True, append_images=[letter()])
     cases = {"missing": folder / "fehlt.jpg", "not-picture": pdf, "unsupported": word,
-             "unreadable": text, "several-frames": pages}
+             "unreadable": text}
     for kind, path in cases.items():
         with pytest.raises(TypdocError) as caught:
             Project.open([path]).build()
@@ -163,3 +161,24 @@ def test_a_step_of_docrepro(tmp_path: Path, heic: bytes) -> None:
     assert adapter.write(again, tmp_path / "again", "foto", None)["document"].read_bytes() \
         == paths["document"].read_bytes()
     assert adapter.version == importlib.metadata.version("typdoc")
+
+
+
+def test_a_file_of_several_pictures_is_a_page_for_each(tmp_path: Path, jpeg: bytes) -> None:
+    """A TIFF of three pages and a photo: four pages, the TIFF in the PDF once, attached to
+    each of its pages, each showing its own page upright; the origin names the two files;
+    typdoc gives both back as they came."""
+    from tests.conftest import several
+
+    scan = tmp_path / "scan.tiff"
+    scan.write_bytes(several(letter(mode="L"), letter(300, 200), letter(), form="TIFF"))
+    photo = tmp_path / "foto.jpg"
+    photo.write_bytes(jpeg)
+    bound = Project.open([scan, photo]).build()
+    assert bound.pages == 4 and len(bound.bound) == 2 and bound.attached == [True, False]
+    with pymupdf.open("pdf", bound.pdf) as doc:
+        assert len(doc) == 4
+        assert doc[1].rect.width > doc[1].rect.height  # the second page of the scan lies wide
+        assert doc.embfile_count() == 1 and doc.embfile_get(0) == scan.read_bytes()
+        for n in range(3):
+            assert "AF" in doc.xref_get_keys(doc[n].xref)

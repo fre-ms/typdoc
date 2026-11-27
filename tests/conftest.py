@@ -46,6 +46,11 @@ def encoded(image: Image.Image, format_: str, **options: object) -> bytes:
     return buffer.getvalue()
 
 
+def several(*images: Image.Image, form: str = "TIFF") -> bytes:
+    """A file of several pictures: a TIFF of several pages, a HEIC of several images."""
+    return encoded(images[0], form, save_all=True, append_images=list(images[1:]))
+
+
 def with_orientation(jpeg: bytes, orientation: int) -> bytes:
     """A JPEG as a camera writes it that was held turned: EXIF orientation ``n``."""
     exif = (b"Exif\0\0" + b"MM\0\x2a\0\0\0\x08" + b"\0\x01"
@@ -69,7 +74,7 @@ def heic() -> bytes:
     return encoded(letter(), "HEIF", quality=80)
 
 
-def reference_bind(pictures: list[tuple[str, bytes, bytes | None]], work: Path
+def reference_bind(pictures: list[tuple[str, bytes, bytes | list[bytes] | None]], work: Path
                    ) -> tuple[bytes, list[dict[str, str]]]:
     """The same pictures bound by the reference library of medRDS: the PDF and what its
     origin names."""
@@ -77,17 +82,22 @@ def reference_bind(pictures: list[tuple[str, bytes, bytes | None]], work: Path
     listed = []
     for n, (name, data, shown) in enumerate(pictures):
         (work / f"{n}.bin").write_bytes(data)
-        if shown is not None:
-            (work / f"{n}.shown").write_bytes(shown)
+        shown_files = []
+        for k, one in enumerate(shown if isinstance(shown, list) else [shown]):
+            if one is not None:
+                (work / f"{n}.{k}.shown").write_bytes(one)
+                shown_files.append(str(work / f"{n}.{k}.shown"))
         listed.append({"name": name, "file": str(work / f"{n}.bin"),
-                       "shown": str(work / f"{n}.shown") if shown is not None else None})
+                       "shown": (shown_files if isinstance(shown, list)
+                                 else shown_files[0] if shown_files else None)})
     script = (
         "import { readFileSync } from 'node:fs';"
         f"import {{ bindPictures }} from '{(MEDRDS / 'lib' / 'index.mjs').as_posix()}';"
         f"const listed = {json.dumps(listed)};"
         "const read = (file) => new Uint8Array(readFileSync(file));"
         "const pictures = listed.map((p) => ({ name: p.name, bytes: read(p.file),"
-        " ...(p.shown ? { shown: read(p.shown) } : {}) }));"
+        " ...(p.shown ? { shown: Array.isArray(p.shown) ? p.shown.map(read) : read(p.shown) }"
+        " : {}) }));"
         "const { bytes, bound } = await bindPictures(pictures);"
         "console.log(JSON.stringify({ pdf: Buffer.from(bytes).toString('base64'), bound }));")
     run = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True,
