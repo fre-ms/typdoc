@@ -46,14 +46,14 @@ def test_bound_and_made_again(tmp_path: Path, jpeg: bytes, png: bytes, heic: byt
                                for data, suffix in ((jpeg, ".jpg"), (png, ".png"),
                                                     (heic, ".heic"))]},
         "options": {"to": "pdf"}}
-    everything = first["pdf"].read_bytes() + first["config"].read_bytes()
+    everything = first["document"].read_bytes() + first["config"].read_bytes()
     assert PATIENT.encode() not in everything and b"Mustermann" not in first["config"].read_bytes()
     assert str(tmp_path).encode() not in everything
     again = Project.open(paths, config=config)
     second = output.write(again.build(), tmp_path / "b", "brief")
-    for key in ("pdf", "config"):
+    for key in ("document", "config"):
         assert first[key].read_bytes() == second[key].read_bytes(), key
-    with pymupdf.open(first["pdf"]) as doc:
+    with pymupdf.open(first["document"]) as doc:
         assert len(doc) == 3 and doc.embfile_get("picture-3.heic") == heic
 
 
@@ -153,9 +153,9 @@ def test_a_step_of_docrepro(tmp_path: Path, heic: bytes) -> None:
         assert adapter.dropped(project) == []
     finally:
         adapter.close(project)
-    assert seen == [(1, 1)] and paths["pdf"].name == "foto.pdf"
+    assert seen == [(1, 1)] and paths["document"].name == "foto.pdf"
     assert config["input"]["pictures"][0]["suffix"] == ".heic"
     again = adapter.open(photo, config, {}, tmp_path / "scratch")
-    assert adapter.write(again, tmp_path / "again", "foto", None)["pdf"].read_bytes() \
-        == paths["pdf"].read_bytes()
+    assert adapter.write(again, tmp_path / "again", "foto", None)["document"].read_bytes() \
+        == paths["document"].read_bytes()
     assert adapter.version == importlib.metadata.version("typdoc")

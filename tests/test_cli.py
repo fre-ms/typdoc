@@ -70,11 +70,11 @@ def test_run_on_the_command_line(tmp_path: Path, jpeg: bytes, png: bytes) -> Non
     again = run(["run", str(source / "seite-1.jpg"), str(source / "seite-2.png"),
                  "--out", str(tmp_path / "again"), "--config", answer["config"]])
     assert again.returncode == 0, again.stdout
-    for key in ("pdf", "config"):
+    for key in ("document", "config"):
         assert Path(json.loads(again.stdout)[key]).read_bytes() == Path(answer[key]).read_bytes()
     beside = run(["run", str(source / "seite-1.jpg")])  # without --out: beside the picture
     assert beside.returncode == 0
-    assert Path(json.loads(beside.stdout)["pdf"]).parent.name == "seite-1.typdoc"
+    assert Path(json.loads(beside.stdout)["document"]).parent.name == "seite-1.typdoc"
 
 
 def test_failures_without_paths(tmp_path: Path, jpeg: bytes,

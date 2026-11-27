@@ -22,7 +22,7 @@ from typdoc import __version__, medrds, pictures
 from typdoc.errors import TypdocError
 from typdoc.project import SUFFIX, TYPES, Options, Project, load_config
 
-INTERFACE = 1  # the version of docs/interface.md the answers follow
+INTERFACE = 2  # the version of docs/interface.md the answers follow
 TOOL = "typdoc"
 
 

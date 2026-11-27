@@ -16,12 +16,13 @@ from typdoc.project import SUFFIX, Bound
 
 def write(bound: Bound, folder: str | Path, stem: str) -> dict[str, Path]:
     """Write the PDF and the configuration document into ``folder`` (made when missing);
-    returns their paths by kind.  Raises "unwritable"."""
+    returns their paths by kind ("document": the bound PDF; "config").  Raises
+    "unwritable"."""
     folder = Path(folder)
-    paths = {"pdf": folder / f"{stem}.pdf", "config": folder / f"{stem}{SUFFIX}"}
+    paths = {"document": folder / f"{stem}.pdf", "config": folder / f"{stem}{SUFFIX}"}
     try:
         folder.mkdir(parents=True, exist_ok=True)
-        paths["pdf"].write_bytes(bound.pdf)
+        paths["document"].write_bytes(bound.pdf)
         paths["config"].write_bytes(documents.document_bytes(bound.config))
     except OSError as e:
         raise TypdocError("unwritable") from e

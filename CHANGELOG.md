@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2026-11-27)
+
+Interface 2: one field renamed, in every tool of docrepro at once.
+
+- **The answer names the bound PDF `document`**, no longer `pdf`; `typdoc.output.write` returns it
+  under that key. The tools of docrepro name what they hand on alike, whatever its type. Callers
+  read `document` where they read `pdf`.
+
 ## 0.1.0 (2026-11-27)
 
 typdoc, step 5 of docrepro: a document's type changed, and nothing else.

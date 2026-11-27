@@ -1,6 +1,6 @@
 [project]
 name = "typdoc"
-version = "0.1.0"
+version = "0.2.0"
 description = "Changes a document's type and nothing else: binds pictures (a photo, a scan, several of them) into one PDF as the standard medRDS says, every picture in it byte for byte; reproducible."
 readme = "README.md"
 requires-python = ">=3.12"

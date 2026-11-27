@@ -1,6 +1,6 @@
 # typdoc's command line as an interface
 
-**Interface 1**, since typdoc 0.1.0. This is what a program may rely on when it calls typdoc,
+**Interface 2**, since typdoc 0.2.0. This is what a program may rely on when it calls typdoc,
 whatever language it is written in: a records app, a script, docrepro.
 
 Every answer carries `interface`. It goes up when something a caller relies on changes in a way
@@ -8,6 +8,9 @@ that breaks it: a field or a kind of error removed or renamed, a meaning changed
 interface, new fields, new options and new kinds of error may come; a caller ignores fields it
 does not know and treats an unknown kind of error like any other (its message says what
 happened). Releases are tagged; pin a tag, not a branch.
+
+**From interface 1:** the answer names the bound PDF `document`, no longer `pdf`, as every tool of
+docrepro does from now on (a document need not be a PDF, though typdoc's always is one).
 
 typdoc does one step of docrepro: it **changes a document's type** and nothing else. Pictures
 become one PDF, bound as the standard medRDS says (specification 9.5). The step is optional: the
@@ -30,13 +33,13 @@ is nothing to decide but the order of the pictures, which is the order they are 
 
 | field | example | meaning |
 |---|---|---|
-| `interface` | `1` | the version of this description |
-| `made_with` | `"typdoc 0.1.0"` | the program and its version |
+| `interface` | `2` | the version of this description |
+| `made_with` | `"typdoc 0.2.0"` | the program and its version |
 
 ## `about`
 
 ```json
-{"interface": 1, "made_with": "typdoc 0.1.0", "version": "0.1.0",
+{"interface": 2, "made_with": "typdoc 0.2.0", "version": "0.2.0",
  "standard": "https://medrds.org/spec/0.15",
  "pictures": ["jpg", "jpeg", "png", "tif", "tiff", "heic", "heif", "webp", "bmp", "gif"],
  "to": ["pdf"]}
@@ -73,8 +76,8 @@ picture) it writes two files, named after the first picture:
 The answer:
 
 ```json
-{"interface": 1, "made_with": "typdoc 0.1.0",
- "pdf": "<folder>/<stem>.pdf", "config": "<folder>/<stem>.typdoc.json", "pages": 2,
+{"interface": 2, "made_with": "typdoc 0.2.0",
+ "document": "<folder>/<stem>.pdf", "config": "<folder>/<stem>.typdoc.json", "pages": 2,
  "bound": [{"sha256": "…", "attached": false}, {"sha256": "…", "attached": true}]}
 ```
 
@@ -90,7 +93,7 @@ picture.
 ## The configuration document: `typdoc-config`, version 1
 
 ```json
-{"format": "typdoc-config", "version": 1, "made_with": "typdoc 0.1.0",
+{"format": "typdoc-config", "version": 1, "made_with": "typdoc 0.2.0",
  "input": {"pictures": [{"sha256": "…", "bytes": 245678, "suffix": ".jpg"},
                         {"sha256": "…", "bytes": 1832011, "suffix": ".heic"}]},
  "options": {"to": "pdf"}}
@@ -105,7 +108,7 @@ PDF and nothing more); within docrepro the chain document does.
 ## Failures
 
 ```json
-{"interface": 1, "made_with": "typdoc 0.1.0", "error": "not-picture", "details": {},
+{"interface": 2, "made_with": "typdoc 0.2.0", "error": "not-picture", "details": {},
  "message": {"en": "typdoc binds pictures into a PDF; this file is a PDF already.",
              "de": "typdoc bindet Bilder zu einem PDF; diese Datei ist schon ein PDF."}}
 ```
