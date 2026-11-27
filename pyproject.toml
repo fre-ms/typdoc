@@ -1,6 +1,6 @@
 [project]
 name = "typdoc"
-version = "0.2.0"
+version = "0.2.1"
 description = "Changes a document's type and nothing else: binds pictures (a photo, a scan, several of them) into one PDF as the standard medRDS says, every picture in it byte for byte; reproducible."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -19,7 +19,7 @@ classifiers = [
 dependencies = [
   # the core the tools of docrepro share: configuration documents, errors, the command
   # line's manners, no network
-  "doccor>=0.2",
+  "doccor>=0.3",
   # pictures that are no JPEG are shown as one: decoded here, HEIC and HEIF too
   "pillow>=11",
   "pillow-heif>=0.20",
@@ -30,7 +30,7 @@ dependencies = [
 typdoc = "typdoc.docrepro:TypdocAdapter"
 
 [tool.uv.sources]
-doccor = { git = "https://github.com/fre-ms/doccor", tag = "v0.2.0" }
+doccor = { git = "https://github.com/fre-ms/doccor", tag = "v0.3.0" }
 
 [project.scripts]
 typdoc = "typdoc.cli:main"

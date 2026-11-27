@@ -12,10 +12,11 @@ from __future__ import annotations
 import io
 from pathlib import Path
 
+from doccor.pictures import SUFFIXES  # the pictures every tool of docrepro takes
+
 from typdoc import medrds
 from typdoc.errors import TypdocError
 
-SUFFIXES = (".jpg", ".jpeg", ".png", ".tif", ".tiff", ".heic", ".heif", ".webp", ".bmp", ".gif")
 QUALITY = 92  # of the JPEG a page shows of a picture that is none
 
 

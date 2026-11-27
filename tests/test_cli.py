@@ -30,7 +30,7 @@ def test_about(capsys: pytest.CaptureFixture[str]) -> None:
     assert answer == {"interface": INTERFACE, "made_with": f"typdoc {__version__}",
                       "version": __version__, "standard": "https://medrds.org/spec/0.15",
                       "pictures": ["jpg", "jpeg", "png", "tif", "tiff", "heic", "heif", "webp",
-                                   "bmp", "gif"],
+                                   "bmp", "gif", "pnm"],
                       "to": ["pdf"]}
 
 

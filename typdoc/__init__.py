@@ -15,4 +15,4 @@ PDF from typdoc or the picture as it came.
 - :mod:`typdoc.cli`: ``typdoc about`` and ``typdoc run``.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"

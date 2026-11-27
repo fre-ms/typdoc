@@ -31,7 +31,7 @@ a description and a signature; it is not a condition. typdoc is the one step tha
 document's type, and it is optional: the steps after it take what they are handed, typdoc's PDF or
 the picture as it came. Why the work is divided so: `docs/family-design.md` in optdoc.
 
-**Status: pre-alpha (0.2.0).**
+**Status: pre-alpha (0.2.1).**
 
 ## Install
 

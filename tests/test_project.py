@@ -102,6 +102,10 @@ def test_what_a_page_shows_of_a_picture_that_is_no_jpeg(png: bytes, jpeg: bytes)
     assert sideways is not None
     with Image.open(io.BytesIO(sideways)) as image:
         assert image.size == (200, 300) and not image.getexif()
+    raster = pictures.shown(encoded(letter(mode="L"), "PPM"))  # a PNM, as every tool takes
+    assert raster is not None and ".pnm" in pictures.SUFFIXES
+    with Image.open(io.BytesIO(raster)) as image:
+        assert image.format == "JPEG" and image.mode == "L"
 
 
 def test_what_is_no_picture(tmp_path: Path, jpeg: bytes) -> None:

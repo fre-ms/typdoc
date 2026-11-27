@@ -10,15 +10,6 @@ from doccor import errors as _core
 from doccor.errors import LANGUAGES, DocError, describe_error
 
 _OWN: dict[str, dict[str, str]] = {
-    "unsupported": {  # worded as optdoc words it
-        "en": "{tool} cannot open files of type {suffix}.",
-        "de": "Dateien vom Typ {suffix} kann {tool} nicht öffnen.",
-    },
-    "unreadable": {
-        "en": "The file cannot be read; it may be damaged or not what its name says.",
-        "de": "Die Datei lässt sich nicht lesen; sie ist vielleicht beschädigt oder nicht, "
-              "was ihr Name sagt.",
-    },
     "not-picture": {
         "en": "{tool} binds pictures into a PDF; this file is a PDF already.",
         "de": "{tool} bindet Bilder zu einem PDF; diese Datei ist schon ein PDF.",

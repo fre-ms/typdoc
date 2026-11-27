@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1 (2026-11-27)
+
+With doccor 0.3.0, which every tool of docrepro names. Interface 2 and `typdoc-config` version 1
+stay.
+
+- **typdoc takes the pictures every tool of docrepro takes** (`doccor.pictures.SUFFIXES`): PNM
+  joins them (attached to its page as it came and shown as a JPEG, like every picture that is
+  no JPEG). `about` lists it.
+- The kinds of error `unsupported` and `unreadable` are worded in doccor, with the same words.
+
 ## 0.2.0 (2026-11-27)
 
 Interface 2: one field renamed, in every tool of docrepro at once.

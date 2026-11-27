@@ -13,8 +13,8 @@ wheels = [
 
 [[package]]
 name = "doccor"
-version = "0.2.0"
-source = { git = "https://github.com/fre-ms/doccor?tag=v0.2.0#c1348a3bb917e1f1bf659647b5d237ee38e996d7" }
+version = "0.3.0"
+source = { git = "https://github.com/fre-ms/doccor?tag=v0.3.0#fae9a71b85dd8239714c29f7169a223c8a50a7c9" }
 dependencies = [
     { name = "pymupdf" },
 ]
@@ -268,7 +268,7 @@ wheels = [
 
 [[package]]
 name = "typdoc"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "doccor" },
@@ -286,7 +286,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "doccor", git = "https://github.com/fre-ms/doccor?tag=v0.2.0" },
+    { name = "doccor", git = "https://github.com/fre-ms/doccor?tag=v0.3.0" },
     { name = "pillow", specifier = ">=11" },
     { name = "pillow-heif", specifier = ">=0.20" },
 ]

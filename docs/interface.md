@@ -34,14 +34,14 @@ is nothing to decide but the order of the pictures, which is the order they are 
 | field | example | meaning |
 |---|---|---|
 | `interface` | `2` | the version of this description |
-| `made_with` | `"typdoc 0.2.0"` | the program and its version |
+| `made_with` | `"typdoc 0.2.1"` | the program and its version |
 
 ## `about`
 
 ```json
-{"interface": 2, "made_with": "typdoc 0.2.0", "version": "0.2.0",
+{"interface": 2, "made_with": "typdoc 0.2.1", "version": "0.2.1",
  "standard": "https://medrds.org/spec/0.15",
- "pictures": ["jpg", "jpeg", "png", "tif", "tiff", "heic", "heif", "webp", "bmp", "gif"],
+ "pictures": ["jpg", "jpeg", "png", "tif", "tiff", "heic", "heif", "webp", "bmp", "gif", "pnm"],
  "to": ["pdf"]}
 ```
 
@@ -76,7 +76,7 @@ picture) it writes two files, named after the first picture:
 The answer:
 
 ```json
-{"interface": 2, "made_with": "typdoc 0.2.0",
+{"interface": 2, "made_with": "typdoc 0.2.1",
  "document": "<folder>/<stem>.pdf", "config": "<folder>/<stem>.typdoc.json", "pages": 2,
  "bound": [{"sha256": "…", "attached": false}, {"sha256": "…", "attached": true}]}
 ```
@@ -93,7 +93,7 @@ picture.
 ## The configuration document: `typdoc-config`, version 1
 
 ```json
-{"format": "typdoc-config", "version": 1, "made_with": "typdoc 0.2.0",
+{"format": "typdoc-config", "version": 1, "made_with": "typdoc 0.2.1",
  "input": {"pictures": [{"sha256": "…", "bytes": 245678, "suffix": ".jpg"},
                         {"sha256": "…", "bytes": 1832011, "suffix": ".heic"}]},
  "options": {"to": "pdf"}}
@@ -108,7 +108,7 @@ PDF and nothing more); within docrepro the chain document does.
 ## Failures
 
 ```json
-{"interface": 2, "made_with": "typdoc 0.2.0", "error": "not-picture", "details": {},
+{"interface": 2, "made_with": "typdoc 0.2.1", "error": "not-picture", "details": {},
  "message": {"en": "typdoc binds pictures into a PDF; this file is a PDF already.",
              "de": "typdoc bindet Bilder zu einem PDF; diese Datei ist schon ein PDF."}}
 ```
