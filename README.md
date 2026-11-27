@@ -24,9 +24,7 @@ usable on its own:
 | 5 | **typdoc** | changes the type: binds pictures into a PDF |
 | 10 | [optdoc](https://github.com/fre-ms/optdoc) | makes the page faithful |
 | 20 | [ocrdoc](https://github.com/fre-ms/ocrdoc) | recognises areas, text, tables and barcodes |
-| 30 | semdoc | understands the text (planned) |
 | 40 | [tagdoc](https://github.com/fre-ms/tagdoc) | describes the document |
-| 50 | attdoc | signs it (planned) |
 
 **No step forces a file type.** PDF is the rule, since one file then holds the pages, their text,
 a description and a signature; it is not a condition. typdoc is the one step that changes a
